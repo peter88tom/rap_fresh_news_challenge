@@ -16,7 +16,9 @@ wi.get_input_work_item()
 # search term
 search_phrase = wi.get_work_item_variable("search_term")
 
-print(search_phrase)
+# Apply categories filters
+categories = ["Business", "Sports", "Books", "Arts", "Climate", "World"]
+
 
 # Initialize the browser library
 browser = Selenium()
@@ -43,10 +45,55 @@ def search_for_results(term):
     go_button = browser.find_element("//button[@class='css-1gudca6 e1iflr852']")
     browser.click_button(go_button)
 
-    #time.sleep(60)
-  
 
-# Find all the search result articles, and apply filters
+# 3. Apply filters and choose the latest news
+def apply_filters(categories):
+    # Click to open the list of categories
+    show_category_button = browser.find_element("//button[@data-testid='search-multiselect-button']")
+    browser.click_button(show_category_button)
+
+
+    # Check the categories
+    tick_category = browser.find_elements("//ul[@data-testid='multi-select-dropdown-list']//li")
+
+    # Loop through the elements to find the category name
+    for t in tick_category:
+        cat_name = t.find_element(By.TAG_NAME, "span")
+
+        # Remove numbers at the end of the category name
+        cleaned_category_name  = ''.join((z for z in cat_name.text if not z.isdigit()))
+    
+        
+       # Check if the category exist in the provided category list then filter the news
+        if categories is []:
+            any_input = t.find_element(By.XPATH,"//input[@value='any']")
+            browser.click_button(any_input)
+
+        
+        elif ('' .join((z for z in cat_name.text if not z.isdigit()))).rstrip() in categories:
+            print(True)
+            current_input = t.find_element(By.TAG_NAME,"span")
+            browser.click_button(current_input)
+        pass
+
+    # Click to close the list of categories 
+    browser.click_button(show_category_button)
+
+
+    # Sort by news news
+    sort_by_relevance =  browser.find_element("//select[@data-testid='SearchForm-sortBy']")
+    browser.click_button(sort_by_relevance)
+
+    # Choose the newst news
+    newst = browser.find_element("//option[@value='newest']")
+    browser.click_button(newst)
+
+    time.sleep(3)
+    #exit()
+
+
+
+# 4. Find all the search result articles and store in an Excel file
 def search_result_articles():
 
      # Create a list to store the data
@@ -58,12 +105,12 @@ def search_result_articles():
 
     # Loop through and extract title, date, and element
     for article in articles:
-        # Extract title
         try:
             title = article.find_element(By.TAG_NAME, "h4")
             article_date = article.find_element(By.CLASS_NAME, "css-17ubb9w")
             description = article.find_element(By.CLASS_NAME, "css-16nhkrn")
             
+            # Append to data
             data.append([title.text, article_date.text, description.text])
         except Exception as e:
             print(e)
@@ -74,6 +121,7 @@ def search_result_articles():
 
     # Save the DataFrame to an Excel file
     df.to_excel("output/nytimes_search_results.xlsx", index=False)
+    #time.sleep(60)
         
 
 # Define a main function that calls the other functions in order
@@ -81,6 +129,7 @@ def main():
     try:
         open_the_website("https://www.nytimes.com/")
         search_for_results(search_phrase)
+        apply_filters(categories)
         search_result_articles()
     finally:
         browser.close_all_browsers()
