@@ -1,0 +1,3 @@
+pandas==2.0.1
+RPA==1.48.1
+selenium==4.9.1

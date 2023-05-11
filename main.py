@@ -5,6 +5,7 @@ Simple robot that opens a web page, search for terms, and takes a screenshot
 # Import the Selenium library
 from RPA.Browser.Selenium import Selenium
 from RPA.Robocorp.WorkItems import WorkItems
+from RPA.HTTP import HTTP
 import time
 import pandas as pd
 from selenium.webdriver.common.by import By
@@ -71,7 +72,6 @@ def apply_filters(categories):
 
         
         elif ('' .join((z for z in cat_name.text if not z.isdigit()))).rstrip() in categories:
-            print(True)
             current_input = t.find_element(By.TAG_NAME,"span")
             browser.click_button(current_input)
         pass
