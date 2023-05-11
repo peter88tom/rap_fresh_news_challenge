@@ -1,7 +1,8 @@
 [
   {
       "payload": {
-         "search_term": "Climate Change"
+         "search_term": "Climate Change",
+         "categories": ["Books", "Arts", "World"]
       },
       "files": {}
   }

@@ -18,7 +18,7 @@ wi.get_input_work_item()
 search_phrase = wi.get_work_item_variable("search_term")
 
 # Apply categories filters
-categories = ["Business", "Sports", "Books", "Arts", "Climate", "World"]
+categories = wi.get_work_item_variable("categories")
 
 
 # Initialize the browser library
