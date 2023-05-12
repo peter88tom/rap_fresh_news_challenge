@@ -9,6 +9,11 @@ from RPA.HTTP import HTTP
 import time
 import pandas as pd
 from selenium.webdriver.common.by import By
+from RPA.FileSystem import FileSystem
+import re
+
+
+
 
 # Get work item variables
 wi = WorkItems()
@@ -21,8 +26,17 @@ search_phrase = wi.get_work_item_variable("search_term")
 categories = wi.get_work_item_variable("categories")
 
 
+# Number of month
+number_of_months = wi.get_work_item_variable("num_months")
+
 # Initialize the browser library
 browser = Selenium()
+
+# Initialize filesystem
+file_system = FileSystem()
+
+Selenium.set_download_directory = '/output/downloads'
+
 
 
 
@@ -102,26 +116,33 @@ def search_result_articles():
     # Loop through and get title, date, and description, picture file name
     for article in articles:
         try:
+            # Extract the title
             title = article.find_element(By.TAG_NAME, "h4")
+
+            # Extract the date
             article_date = article.find_element(By.CLASS_NAME, "css-17ubb9w")
+
+            # Extract the description
             description = article.find_element(By.CLASS_NAME, "css-16nhkrn")
 
-            #picture = article.find_element(By.TAG_NAME, "figure")
-            #print(picture)
-            
+            # Check if the title or description contains any amount of money
+            contains_money = False
+            money_pattern = re.compile(r'\b(\$[0-9,]+(\.[0-9]{1,2})?)|([0-9]+( dollars| USD))\b')
+            if money_pattern.search(title.text) or money_pattern.search(description.text):
+                contains_money = True
             
             # Append to data
-            data.append([title.text, article_date.text, description.text])
+            data.append([title.text, article_date.text, description.text, contains_money])
         except Exception as e:
             print(e)
             pass
-    #exit()
+
+
     # Create a pandas DataFrame from the data
-    df = pd.DataFrame(data, columns=["Title", "Date", "Description"])
+    df = pd.DataFrame(data, columns=["Title", "Date", "Description", "Contains Money"])
 
     # Save the DataFrame to an Excel file
     df.to_excel("output/nytimes_search_results.xlsx", index=False)
-    #time.sleep(60)
         
 
 # Define a main function that calls the other functions in order

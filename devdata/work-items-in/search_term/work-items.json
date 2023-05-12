@@ -1,8 +1,8 @@
 [
   {
       "payload": {
-         "search_term" : "Climate Change", 
-         "categories"  : ["Books", "Arts", "World"],
+         "search_term" : "Stock Prices", 
+         "categories"  : ["Books", "Arts", "World", "Business"],
          "num_months"  : 1 
       },
       "files": {}
