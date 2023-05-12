@@ -61,10 +61,6 @@ def apply_filters(categories):
     for t in tick_category:
         cat_name = t.find_element(By.TAG_NAME, "span")
 
-        # Remove numbers at the end of the category name
-        cleaned_category_name  = ''.join((z for z in cat_name.text if not z.isdigit()))
-    
-        
        # Check if the category exist in the provided category list then filter the news
         if categories is []:
             any_input = t.find_element(By.XPATH,"//input[@value='any']")
@@ -103,19 +99,23 @@ def search_result_articles():
     articles = browser.find_elements("//ol[@data-testid='search-results']//li")
     
 
-    # Loop through and extract title, date, and element
+    # Loop through and get title, date, and description, picture file name
     for article in articles:
         try:
             title = article.find_element(By.TAG_NAME, "h4")
             article_date = article.find_element(By.CLASS_NAME, "css-17ubb9w")
             description = article.find_element(By.CLASS_NAME, "css-16nhkrn")
+
+            #picture = article.find_element(By.TAG_NAME, "figure")
+            #print(picture)
+            
             
             # Append to data
             data.append([title.text, article_date.text, description.text])
         except Exception as e:
             print(e)
             pass
-
+    #exit()
     # Create a pandas DataFrame from the data
     df = pd.DataFrame(data, columns=["Title", "Date", "Description"])
 
