@@ -2,7 +2,7 @@
 Simple robot that opens a web page, search for terms, and takes a screenshot
  of the web page using the RPA.Browser.Selenium librirary
 """
-# Import the Selenium library
+""" Import libraries to use """
 from RPA.Browser.Selenium import Selenium
 from RPA.Robocorp.WorkItems import WorkItems
 from RPA.HTTP import HTTP
@@ -14,7 +14,7 @@ import re
 
 
 
-
+""" Define varible to me used """
 # Get work item variables
 wi = WorkItems()
 wi.get_input_work_item()
@@ -46,7 +46,7 @@ def open_the_website(url):
     browser.open_available_browser(url)
 
 
-# 2. Enter a phrase in the search field
+""" 2. Enter a phrase in the search field """
 def search_for_results(term):
     # Active the search form
     seach_button = browser.find_element("//button[@class='css-tkwi90 e1iflr850']")
@@ -61,7 +61,7 @@ def search_for_results(term):
     browser.click_button(go_button)
 
 
-# 3. Apply filters and choose the latest news
+""" 3. Apply filters and choose the latest news """
 def apply_filters(categories):
     # Click to open the list of categories
     show_category_button = browser.find_element("//button[@data-testid='search-multiselect-button']")
@@ -103,7 +103,7 @@ def apply_filters(categories):
 
 
 
-# 4. Find all the search result articles and store in an Excel file
+""" 4. Find all the search result articles and store in an Excel file """
 def search_result_articles():
 
      # Create a list to store the data
@@ -130,22 +130,26 @@ def search_result_articles():
             money_pattern = re.compile(r'\b(\$[0-9,]+(\.[0-9]{1,2})?)|([0-9]+( dollars| USD))\b')
             if money_pattern.search(title.text) or money_pattern.search(description.text):
                 contains_money = True
+
+            # Count number of occurrence of the search term in the title and description
+            title_count = title.text.lower().count(search_phrase.lower())
+            description_count = description.text.lower().count(search_phrase.lower())
             
             # Append to data
-            data.append([title.text, article_date.text, description.text, contains_money])
+            data.append([title.text, article_date.text, description.text, contains_money, title_count, description_count])
         except Exception as e:
             print(e)
             pass
 
 
     # Create a pandas DataFrame from the data
-    df = pd.DataFrame(data, columns=["Title", "Date", "Description", "Contains Money"])
+    df = pd.DataFrame(data, columns=["Title", "Date", "Description", "Contains Money", "Title Count", "Description Count"])
 
     # Save the DataFrame to an Excel file
     df.to_excel("output/nytimes_search_results.xlsx", index=False)
         
 
-# Define a main function that calls the other functions in order
+""" Define a main function that calls the other functions in order """
 def main():
     try:
         open_the_website("https://www.nytimes.com/")
@@ -156,6 +160,6 @@ def main():
         browser.close_all_browsers()
 
 
-# Call the main function, checking that we are running as a stand-alone script
+""" Call the main function, checking that we are running as a stand-alone script """
 if __name__ == "__main__":
     main()
